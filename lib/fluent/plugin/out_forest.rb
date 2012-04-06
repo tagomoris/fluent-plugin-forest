@@ -1,33 +1,99 @@
 class Fluent::ForestOutput < Fluent::Output
   Fluent::Plugin.register_output('forest', self)
 
+  config_param :subtype, :string
+  config_param :remove_prefix, :string, :default => nil
+  config_param :add_prefix, :string, :default => nil
 
+  def configure(conf)
+    super
 
-# <match converted.*>
-#   type output_forest
-#   subtype hoop
-#   remove_prefix converted
-#   <template>
-#     username hoopuser
-#     flush_interval 60s
-#     output_include_time false
-#     output_include_tag  false
-#     output_data_type attr:field1,field2,field3,field4
-#     add_newline true
-#   </template>
-#   <parameter>
-#     path /hoop/log/%Y%m%d/%TAG-%Y%m%d-%H.log
-#   </parameter>
-#   <tag blog>
-#     hoop_server hoop1.local:14000
-#   </tag>
-#   <tag news>
-#     hoop_server hoop2.local:14000
-#   </tag>
-#   <tag *>
-#     hoop_server hoop3.local:14000
-#   </tag>
-# </match>
+    if @remove_prefix
+      @removed_prefix_string = @remove_prefix + '.'
+      @removed_length = @removed_prefix_string.length
+    end
+    if @add_prefix
+      @added_prefix_string = @add_prefix + '.'
+    end
 
-  
+    @mapping = {} # tag => output
+    @mutex = Mutex.new
+
+    @template = nil
+    @parameter = nil
+    @cases = []
+
+    conf.elements.each do |element|
+      element.keys.each do |k|
+        # read and throw away to supress unread configuration warning
+        element[k]
+      end
+      case element.name
+      when 'template'
+        @template = element
+      when 'parameter'
+        @parameter = element
+      when 'case'
+        matcher = Fluent::GlobMatchPattern.new(element.arg)
+        @cases.push([matcher, element])
+      end
+    end
+
+    self
+  end
+
+  def parameter(tag)
+    pairs = {}
+    keys = []
+    @parameter.each do |k,v|
+      value = v.gsub('__TAG__', tag)
+      pairs[k] = value
+      keys.push(k)
+    end
+    Fluent::Config::Element.new('param', '', pairs, keys)
+  end
+
+  def spec(tag)
+    conf = Fluent::Config::Element.new('instance', '', {}, [])
+    conf += @template if @template
+    conf += parameter(tag) if @parameter
+    @cases.each do |m,e|
+      if m.match(tag)
+        conf += e
+        break
+      end
+    end
+    conf
+  end
+
+  def plant(tag)
+    output = nil
+    @mutex.synchronize {
+      output = Fluent::Plugin.new_output(@subtype)
+      output.configure(spec(tag))
+      @mapping[tag] = output
+    }
+    output
+  end
+
+  def emit(tag, es, chain)
+    if @remove_prefix and
+        ( (tag.start_with?(@removed_prefix_string) and tag.length > @removed_length) or tag == @remove_prefix)
+      tag = tag[@removed_length..-1]
+    end 
+    if @add_prefix
+      tag = if tag.length > 0
+              @added_prefix_string + tag
+            else
+              @add_prefix
+            end
+    end
+
+    output = @mapping[tag]
+    unless output
+      output = plant(tag)
+    end
+
+    output.emit(tag, es, chain)
+  end
 end
