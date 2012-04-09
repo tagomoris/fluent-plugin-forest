@@ -31,8 +31,6 @@ class Fluent::ForestOutput < Fluent::Output
       case element.name
       when 'template'
         @template = element
-      when 'parameter'
-        @parameter = element
       when 'case'
         matcher = Fluent::GlobMatchPattern.new(element.arg)
         @cases.push([matcher, element])
@@ -49,24 +47,20 @@ class Fluent::ForestOutput < Fluent::Output
     end
   end
 
-  def parameter(tag)
+  def parameter(tag, e)
     pairs = {}
-    keys = []
-    @parameter.each do |k,v|
-      value = v.gsub('__TAG__', tag)
-      pairs[k] = value
-      keys.push(k)
+    e.each do |k,v|
+      pairs[k] = v.gsub('__TAG__', tag)
     end
-    Fluent::Config::Element.new('param', '', pairs, keys)
+    Fluent::Config::Element.new('instance', '', pairs, [])
   end
 
   def spec(tag)
     conf = Fluent::Config::Element.new('instance', '', {}, [])
-    conf += @template if @template
-    conf += parameter(tag) if @parameter
+    conf = parameter(tag, @template) + conf if @template # a + b -> b.merge(a) (see: fluentd/lib/fluent/config.rb)
     @cases.each do |m,e|
       if m.match(tag)
-        conf += e
+        conf = parameter(tag, e) + conf
         break
       end
     end
@@ -87,10 +81,12 @@ class Fluent::ForestOutput < Fluent::Output
       }
     rescue Fluent::ConfigError => e
       $log.error "failed to configure sub output #{@subtype}: #{e.message}"
+      $log.error e.backtrace.join("\n")
       $log.error "Cannot output messages with tag '#{tag}'"
       output = nil
     rescue StandardError => e
-      $log.error "failed to start sub output #{@subtype}: #{e.message}"
+      $log.error "failed to configure/start sub output #{@subtype}: #{e.message}"
+      $log.error e.backtrace.join("\n")
       $log.error "Cannot output messages with tag '#{tag}'"
       output = nil
     end

@@ -12,6 +12,7 @@ remove_prefix test
 <template>
   key_name f
   suffix !
+  tag out.__TAG__  
 </template>
 <case foo.bar>
   prefix p1:
@@ -25,9 +26,6 @@ remove_prefix test
 <case *>
   prefix p4:
 </case>
-<parameter>
-  tag out.__TAG__  
-</parameter>
   ]
 
   def create_driver(conf = CONFIG, tag='test.default')
@@ -51,6 +49,7 @@ remove_prefix test
 <template>
   key_name f
   suffix !
+  tag __TAG__  
 </template>
 <case foo.bar>
   prefix p1:
@@ -64,9 +63,6 @@ remove_prefix test
 <case *>
   prefix p4:
 </case>
-<parameter>
-  tag __TAG__  
-</parameter>
     ]
     time = Time.parse("2012-01-02 13:14:15").to_i
     d.tag = 'test.raise.error';  d.run { d.emit({'f' => "message 1"}, time) }
