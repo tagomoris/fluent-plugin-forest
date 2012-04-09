@@ -63,12 +63,14 @@ suffix :end
     assert_equal 'fixed:xyz 123:end', emits[0][2]['msg']
     assert_equal 'aaa bbb ccc', emits[0][2]['alt']
     assert_equal 'test', emits[0][2]['ttt']
+    assert_nil emits[0][2]['not_started']
 
     assert_equal 'foo.bar', emits[1][0]
     assert_equal time, emits[1][1]
     assert_equal 'fixed:xyz 456:end', emits[1][2]['msg']
     assert_equal 'aaa bbb ccc ddd', emits[1][2]['alt']
     assert_equal 'test2', emits[1][2]['ttt']
+    assert_nil emits[1][2]['not_started']
   end
 
   def test_emit2
@@ -89,11 +91,13 @@ suffix :end
     assert_equal 'fixed:xyz 123:end', emits[0][2]['msg']
     assert_equal 'aaa bbb ccc', emits[0][2]['alt']
     assert_equal 'test', emits[0][2]['ttt']
+    assert_nil emits[0][2]['not_started']
 
     assert_equal 'foo.bar', emits[1][0]
     assert_equal time, emits[1][1]
     assert_equal 'fixed:xyz 456:end', emits[1][2]['msg']
     assert_equal 'aaa bbb ccc ddd', emits[1][2]['alt']
     assert_equal 'test2', emits[1][2]['ttt']
+    assert_nil emits[1][2]['not_started']
   end
 end

@@ -42,6 +42,13 @@ class Fluent::ForestOutput < Fluent::Output
     self
   end
 
+  def shutdown
+    super
+    @mapping.values.each do |output|
+      output.shutdown
+    end
+  end
+
   def parameter(tag)
     pairs = {}
     keys = []
@@ -68,11 +75,25 @@ class Fluent::ForestOutput < Fluent::Output
 
   def plant(tag)
     output = nil
-    @mutex.synchronize {
-      output = Fluent::Plugin.new_output(@subtype)
-      output.configure(spec(tag))
-      @mapping[tag] = output
-    }
+    begin
+      @mutex.synchronize {
+        output = @mapping[tag]
+        unless output
+          output = Fluent::Plugin.new_output(@subtype)
+          output.configure(spec(tag))
+          output.start
+          @mapping[tag] = output
+        end
+      }
+    rescue Fluent::ConfigError => e
+      $log.error "failed to configure sub output #{@subtype}: #{e.message}"
+      $log.error "Cannot output messages with tag '#{tag}'"
+      output = nil
+    rescue StandardError => e
+      $log.error "failed to start sub output #{@subtype}: #{e.message}"
+      $log.error "Cannot output messages with tag '#{tag}'"
+      output = nil
+    end
     output
   end
 
@@ -93,7 +114,10 @@ class Fluent::ForestOutput < Fluent::Output
     unless output
       output = plant(tag)
     end
-
-    output.emit(tag, es, chain)
+    if output
+      output.emit(tag, es, chain)
+    else
+      chain.next
+    end
   end
 end

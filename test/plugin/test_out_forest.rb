@@ -38,6 +38,42 @@ remove_prefix test
     assert_nothing_raised { d = create_driver }
   end
 
+  def test_faild_plant
+    d = create_driver
+    time = Time.parse("2012-01-02 13:14:15").to_i
+    d.tag = 'test.xxxxxx';  d.run { d.emit({'f' => "message 1"}, time) }
+    emits = d.emits
+    assert_equal 1, emits.length
+
+    d = create_driver %[
+subtype forest_test
+remove_prefix test
+<template>
+  key_name f
+  suffix !
+</template>
+<case foo.bar>
+  prefix p1:
+</case>
+<case foo.*>
+  prefix p2:
+</case>
+<case bar.**>
+  prefix p3:
+</case>
+<case *>
+  prefix p4:
+</case>
+<parameter>
+  tag __TAG__  
+</parameter>
+    ]
+    time = Time.parse("2012-01-02 13:14:15").to_i
+    d.tag = 'test.raise.error';  d.run { d.emit({'f' => "message 1"}, time) }
+    emits = d.emits
+    assert_equal 0, emits.length
+  end
+
   def test_emit
     d = create_driver
     time = Time.parse("2012-01-02 13:14:15").to_i
@@ -56,40 +92,48 @@ remove_prefix test
     assert_equal 'out.first', e[0]
     assert_equal time, e[1]
     assert_equal "p4:message 1!", e[2]['f']
+    assert_nil e[2]['not_started']
     
     e = emits[1]
     assert_equal 'out.second', e[0]
     assert_equal time, e[1]
     assert_equal "p4:message 2!", e[2]['f']
+    assert_nil e[2]['not_started']
 
     e = emits[2]
     assert_equal 'out.foo.bar', e[0]
     assert_equal time, e[1]
     assert_equal "p1:message 3!", e[2]['f']
+    assert_nil e[2]['not_started']
 
     e = emits[3]
     assert_equal 'out.foo.baz', e[0]
     assert_equal time, e[1]
     assert_equal "p2:message 4!", e[2]['f']
+    assert_nil e[2]['not_started']
 
     e = emits[4]
     assert_equal 'out.bar', e[0]
     assert_equal time, e[1]
     assert_equal "p3:message 5!", e[2]['f']
+    assert_nil e[2]['not_started']
 
     e = emits[5]
     assert_equal 'out.baz', e[0]
     assert_equal time, e[1]
     assert_equal "p4:message 6!", e[2]['f']
+    assert_nil e[2]['not_started']
 
     e = emits[6]
     assert_equal 'out.foo.bar', e[0]
     assert_equal time, e[1]
     assert_equal "p1:message 7!", e[2]['f']
+    assert_nil e[2]['not_started']
 
     e = emits[7]
     assert_equal 'out.bar', e[0]
     assert_equal time, e[1]
     assert_equal "p3:message 8!", e[2]['f']
+    assert_nil e[2]['not_started']
   end
 end
