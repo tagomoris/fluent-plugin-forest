@@ -1,29 +1,103 @@
-# Fluent::Plugin::Forest
+# fluent-plugin-forest
 
-TODO: Write a gem description
+## Component
 
-## Installation
+### ForestOutput
 
-Add this line to your application's Gemfile:
+ForestOutput creates sub plugin instance of a output plugin dynamically per tag, from template configurations.
+In template configurations, you can write configuration lines for overall tags by <template>, and for specified tags by <case TAG_PATTERN>, and you can use \_\_TAG\_\_ placeholder at anywhere in <template> and <case>.
 
-    gem 'fluent-plugin-forest'
+This plugin helps you if you are writing very long configurations by copy&paste with a little little diff for many tags.
 
-And then execute:
+You SHOULD NOT use ForestOutput for tags increasing infinitly. 
 
-    $ bundle
+## Configuration
 
-Or install it yourself as:
+### ForestOutput
 
-    $ gem install fluent-plugin-forest
+If you are writing long long configurations like below:
 
-## Usage
+    <match service.blog>
+      type file
+      time_slice_format %Y%m%d%H
+      compress yes
+      path /var/log/blog.*.log
+    </match>
+    <match service.portal>
+      type file
+      time_slice_format %Y%m%d%H
+      compress yes
+      path /var/log/portal.*.log
+    </match>
+    <match service.news>
+      type file
+      time_slice_format %Y%m%d%H
+      compress yes
+      path /var/log/news.*.log
+    </match>
+    <match service.sns>
+      type file
+      time_slice_format %Y%m%d%H
+      compress yes
+      path /var/log/sns.*.log
+    </match>
+    # ...
 
-TODO: Write usage instructions here
+You can write configuration with ForestOutput like below:
 
-## Contributing
+    <match service.*>
+      type forest
+      subtype file
+      remove_prefix service
+      <template>
+        time_slice_format %Y%m%d%H
+        compress yes
+        path /var/log/__TAG__.*.log
+      </template>
+    </match>
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+If you want to place logs /var/archive for `service.search.**` without compression, `case` directive is useful:
+
+    <match service.*>
+      type forest
+      subtype file
+      remove_prefix service
+      <template>
+        time_slice_format %Y%m%d%H
+      </template>
+      <case search.**>
+        compress no
+        path /var/archive/__TAG__.*.log
+      </case>
+      <case *>
+        compress yes
+        path /var/log/__TAG__.*.log
+      </case>
+    </match>
+
+`case` configuration overwrites `template` configuration, so you can also write like this:
+
+    <match service.*>
+      type forest
+      subtype file
+      remove_prefix service
+      <template>
+        time_slice_format %Y%m%d%H
+        compress yes
+        path /var/log/__TAG__.*.log
+      </template>
+      <case search.**>
+        compress no
+        path /var/archive/__TAG__.*.log
+      </case>
+    </match>
+
+## TODO
+
+* consider what to do next
+* patches welcome!
+
+## Copyright
+
+Copyright:: Copyright (c) 2012- TAGOMORI Satoshi (tagomoris)
+License::   Apache License, Version 2.0
