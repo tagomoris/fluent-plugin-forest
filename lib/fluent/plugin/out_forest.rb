@@ -79,6 +79,7 @@ class Fluent::ForestOutput < Fluent::Output
           @mapping[tag] = output
         end
       }
+      $log.info "out_forest plants new output: #{@subtype} for tag '#{tag}'"
     rescue Fluent::ConfigError => e
       $log.error "failed to configure sub output #{@subtype}: #{e.message}"
       $log.error e.backtrace.join("\n")
