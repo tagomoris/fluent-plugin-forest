@@ -36,6 +36,52 @@ remove_prefix test
     assert_nothing_raised { d = create_driver }
   end
 
+  def test_spec
+    d = create_driver %[
+subtype hoge
+<template>
+  keyx xxxxxx
+  keyy yyyyyy.__TAG__
+  alt_key a
+</template>
+<case xx>
+  keyz z1
+  alt_key b
+</case>
+<case yy.**>
+  keyz z2
+  alt_key c
+</case>
+<case *>
+  keyz z3
+  alt_key d.__TAG__
+</case>
+    ]
+    conf = d.instance.spec('xx')
+    assert_equal 'xxxxxx', conf['keyx']
+    assert_equal 'yyyyyy.xx', conf['keyy']
+    assert_equal 'z1', conf['keyz']
+    assert_equal 'b', conf['alt_key']
+    
+    conf = d.instance.spec('yy')
+    assert_equal 'xxxxxx', conf['keyx']
+    assert_equal 'yyyyyy.yy', conf['keyy']
+    assert_equal 'z2', conf['keyz']
+    assert_equal 'c', conf['alt_key']
+
+    conf = d.instance.spec('yy.3')
+    assert_equal 'xxxxxx', conf['keyx']
+    assert_equal 'yyyyyy.yy.3', conf['keyy']
+    assert_equal 'z2', conf['keyz']
+    assert_equal 'c', conf['alt_key']
+
+    conf = d.instance.spec('zz')
+    assert_equal 'xxxxxx', conf['keyx']
+    assert_equal 'yyyyyy.zz', conf['keyy']
+    assert_equal 'z3', conf['keyz']
+    assert_equal 'd.zz', conf['alt_key']
+  end
+
   def test_faild_plant
     d = create_driver
     time = Time.parse("2012-01-02 13:14:15").to_i
