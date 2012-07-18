@@ -1,3 +1,4 @@
+require 'fluent/test'
 class Fluent::ForestTestOutput < Fluent::Output
   Fluent::Plugin.register_output('forest_test', self)
 
