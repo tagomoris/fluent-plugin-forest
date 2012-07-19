@@ -4,6 +4,7 @@ class Fluent::ForestOutput < Fluent::Output
   config_param :subtype, :string
   config_param :remove_prefix, :string, :default => nil
   config_param :add_prefix, :string, :default => nil
+  config_param :hostname, :string, :default => `hostname`.chomp
 
   def configure(conf)
     super
@@ -50,7 +51,7 @@ class Fluent::ForestOutput < Fluent::Output
   def parameter(tag, e)
     pairs = {}
     e.each do |k,v|
-      pairs[k] = v.gsub('__TAG__', tag)
+      pairs[k] = v.gsub('__TAG__', tag).gsub('__HOSTNAME__', @hostname)
     end
     Fluent::Config::Element.new('instance', '', pairs, [])
   end
