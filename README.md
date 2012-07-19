@@ -103,5 +103,6 @@ If you want to place logs /var/archive for `service.search.**` as filename with 
 
 ## Copyright
 
-Copyright:: Copyright (c) 2012- TAGOMORI Satoshi (tagomoris)
-License::   Apache License, Version 2.0
+* Copyright (c) 2012- TAGOMORI Satoshi (tagomoris)
+* License
+  * Apache License, Version 2.0
