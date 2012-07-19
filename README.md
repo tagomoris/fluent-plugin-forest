@@ -9,6 +9,10 @@ In template configurations, you can write configuration lines for overall tags b
 
 This plugin helps you if you are writing very long configurations by copy&paste with a little little diff for many tags.
 
+Other supported placeholders:
+* \_\_HOSTNAME\_\_
+  * replaced with string specified by 'hostname' configuration value, or (default) result of 'hostname' command
+
 You SHOULD NOT use ForestOutput for tags increasing infinitly. 
 
 ## Configuration
@@ -56,7 +60,7 @@ You can write configuration with ForestOutput like below:
       </template>
     </match>
 
-If you want to place logs /var/archive for `service.search.**` without compression, `case` directive is useful:
+If you want to place logs /var/archive for `service.search.**` as filename with hostname, without compression, `case` directive is useful:
 
     <match service.*>
       type forest
@@ -67,7 +71,7 @@ If you want to place logs /var/archive for `service.search.**` without compressi
       </template>
       <case search.**>
         compress no
-        path /var/archive/__TAG__.*.log
+        path /var/archive/__TAG__.__HOSTNAME__.*.log
       </case>
       <case *>
         compress yes
