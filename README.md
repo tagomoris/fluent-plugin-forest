@@ -5,12 +5,12 @@
 ### ForestOutput
 
 ForestOutput creates sub plugin instance of a output plugin dynamically per tag, from template configurations.
-In template configurations, you can write configuration lines for overall tags by <template>, and for specified tags by <case TAG_PATTERN>, and you can use \_\_TAG\_\_ placeholder at anywhere in <template> and <case>.
+In template configurations, you can write configuration lines for overall tags by <template>, and for specified tags by <case TAG_PATTERN>, and you can use \_\_TAG\_\_ (or ${tag}) placeholder at anywhere in <template> and <case>.
 
 This plugin helps you if you are writing very long configurations by copy&paste with a little little diff for many tags.
 
 Other supported placeholders:
-* \_\_HOSTNAME\_\_
+* \_\_HOSTNAME\_\_ (or ${hostname})
   * replaced with string specified by 'hostname' configuration value, or (default) result of 'hostname' command
 
 You SHOULD NOT use ForestOutput for tags increasing infinitly. 
@@ -56,7 +56,7 @@ You can write configuration with ForestOutput like below:
       <template>
         time_slice_format %Y%m%d%H
         compress yes
-        path /var/log/__TAG__.*.log
+        path /var/log/${tag}.*.log
       </template>
     </match>
 
