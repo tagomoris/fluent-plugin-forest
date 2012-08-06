@@ -148,7 +148,7 @@ subtype hoge
 </case>
 <case *>
   keyz z3
-  alt_key d.__TAG__.__HOSTNAME__
+  alt_key d.${tag}.${hostname}
 </case>
     ]
     conf = d.instance.spec('xx')

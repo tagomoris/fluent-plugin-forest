@@ -51,7 +51,7 @@ class Fluent::ForestOutput < Fluent::Output
   def parameter(tag, e)
     pairs = {}
     e.each do |k,v|
-      pairs[k] = v.gsub('__TAG__', tag).gsub('__HOSTNAME__', @hostname)
+      pairs[k] = v.gsub('__TAG__', tag).gsub('${tag}', tag).gsub('__HOSTNAME__', @hostname).gsub('${hostname}', @hostname)
     end
     Fluent::Config::Element.new('instance', '', pairs, [])
   end
