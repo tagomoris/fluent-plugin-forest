@@ -17,6 +17,8 @@ You SHOULD NOT use ForestOutput for tags increasing infinitly.
 
 ## Configuration
 
+**NOTICE:** If you configure `fluent-plugin-forest` with `buffer_type file` (or plugins, default buffer type is file), you should modify `buffer_path` with `__TAG__` (or `${tag}`) to help to use buffer files for each tags.
+
 ### ForestOutput
 
 If you are writing long long configurations like below:
