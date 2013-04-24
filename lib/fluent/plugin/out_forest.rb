@@ -1,10 +1,12 @@
-class Fluent::ForestOutput < Fluent::Output
+class Fluent::ForestOutput < Fluent::MultiOutput
   Fluent::Plugin.register_output('forest', self)
 
   config_param :subtype, :string
   config_param :remove_prefix, :string, :default => nil
   config_param :add_prefix, :string, :default => nil
   config_param :hostname, :string, :default => `hostname`.chomp
+
+  attr_reader :outputs
 
   def configure(conf)
     super
@@ -18,6 +20,7 @@ class Fluent::ForestOutput < Fluent::Output
     end
 
     @mapping = {} # tag => output
+    @outputs = []
     @mutex = Mutex.new
 
     @template = nil
@@ -78,6 +81,7 @@ class Fluent::ForestOutput < Fluent::Output
           output.configure(spec(tag))
           output.start
           @mapping[tag] = output
+          @outputs.push(output)
         end
       }
       $log.info "out_forest plants new output: #{@subtype} for tag '#{tag}'"
@@ -99,7 +103,7 @@ class Fluent::ForestOutput < Fluent::Output
     if @remove_prefix and
         ( (tag.start_with?(@removed_prefix_string) and tag.length > @removed_length) or tag == @remove_prefix)
       tag = tag[@removed_length..-1]
-    end 
+    end
     if @add_prefix
       tag = if tag.length > 0
               @added_prefix_string + tag
