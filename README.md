@@ -98,9 +98,34 @@ If you want to place logs /var/archive for `service.search.**` as filename with 
       </case>
     </match>
 
+Current version of this plugin doesn't support subsections in `<template>` and `<case>`. This doesn't works as we expect.
+
+    <match service.*>
+      type forest
+      subtype copy
+      <template>
+        <store>
+          type file
+          path /path/to/copy1
+        </store>
+        <store>
+          type file
+          path /path/to/copy2
+        </store>
+      </template>
+      <case search.**>
+        <store>
+          type file
+          path /path/to/copy3
+        </store>
+      </case>
+    </match>
+
+For copy+forest pattern, you can use `fluent-plugin-forest` in `<store>` section of out\_copy. (except for variable numbers of `<store>` sections.)
+
 ## TODO
 
-* consider what to do next
+* Subsections support in `<template>` and `<case>`
 * patches welcome!
 
 ## Copyright
