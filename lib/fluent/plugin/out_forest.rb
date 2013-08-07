@@ -28,10 +28,9 @@ class Fluent::ForestOutput < Fluent::MultiOutput
     @cases = []
 
     conf.elements.each do |element|
-      element.keys.each do |k|
-        # read and throw away to supress unread configuration warning
-        element[k]
-      end
+      # read and throw away to supress unread configuration warning
+      touch_recursive(element)
+
       case element.name
       when 'template'
         @template = element
@@ -44,6 +43,15 @@ class Fluent::ForestOutput < Fluent::MultiOutput
     self
   end
 
+  def touch_recursive(e)
+    e.keys.each do |k|
+      e[k]
+    end
+    e.elements.each do |child|
+      touch_recursive(child)
+    end
+  end
+
   def shutdown
     super
     @mapping.values.each do |output|
@@ -51,12 +59,15 @@ class Fluent::ForestOutput < Fluent::MultiOutput
     end
   end
 
-  def parameter(tag, e)
+  def parameter(tag, e, name = 'instance')
     pairs = {}
     e.each do |k,v|
       pairs[k] = v.gsub('__TAG__', tag).gsub('${tag}', tag).gsub('__HOSTNAME__', @hostname).gsub('${hostname}', @hostname)
     end
-    Fluent::Config::Element.new('instance', '', pairs, [])
+    elements = e.elements.map do |child|
+      parameter(tag, child, child.name)
+    end
+    Fluent::Config::Element.new(name, '', pairs, elements)
   end
 
   def spec(tag)
