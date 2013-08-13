@@ -82,8 +82,7 @@ subtype hoge
     assert_equal 'd.zz', conf['alt_key']
   end
 
-  def test_spec_nested
-    d = create_driver %[
+  NESTED_CONF = %[
 subtype hoge
 <template>
   keyx xxxxxx
@@ -135,68 +134,98 @@ subtype hoge
   </tag_with>
 </case>
     ]
+
+  def test_spec_nested_overwrite_attributes_only
+    d = create_driver NESTED_CONF
     conf = d.instance.spec('xx')
     assert_equal 'xxxxxx', conf['keyx']
     assert_equal 'yyyyyy.xx', conf['keyy']
     assert_equal 'z1', conf['keyz']
     assert_equal 'b', conf['alt_key']
+
     assert_equal 5, conf.elements.size
+
     assert_equal 'tagx', conf.elements[0].name
     assert_equal 'xxx', conf.elements[0]['key']
+
     assert_equal 'tagy', conf.elements[1].name
     assert_equal 'yyy.xx', conf.elements[1]['key']
+
     assert_equal 'tag_with', conf.elements[2].name
     assert_equal 'attr.foo', conf.elements[2].arg
     assert_equal 'bar', conf.elements[2]['key']
+
     assert_equal 'tag_with', conf.elements[3].name
     assert_equal 'attr.foo', conf.elements[3].arg
     assert_equal 'dup', conf.elements[3]['key']
+
     assert_equal 'tag_with', conf.elements[4].name
     assert_equal 'attr.foo', conf.elements[4].arg
     assert_equal 'dupdup', conf.elements[4]['key']
-
+  end
+  def test_spec_nested_overwrite_subsections_with_arg
+    d = create_driver NESTED_CONF
     conf = d.instance.spec('yy')
+
     assert_equal 'xxxxxx', conf['keyx']
     assert_equal 'yyyyyy.yy', conf['keyy']
     assert_equal 'z2', conf['keyz']
     assert_equal 'c', conf['alt_key']
+
     assert_equal 5, conf.elements.size
+
     assert_equal 'tagx', conf.elements[0].name
     assert_equal 'not_overwrite', conf.elements[0]['key']
+
     assert_equal 'tag_with', conf.elements[1].name
     assert_equal 'attr.foo', conf.elements[1].arg
     assert_equal 'overwrite', conf.elements[1]['key']
+
     assert_equal 'tag_with', conf.elements[2].name
     assert_equal 'attr.foo', conf.elements[2].arg
     assert_equal 'overwrite_dup', conf.elements[2]['key']
+
     assert_equal 'tagx', conf.elements[3].name
     assert_equal 'xxx', conf.elements[3]['key']
+
     assert_equal 'tagy', conf.elements[4].name
     assert_equal 'yyy.yy', conf.elements[4]['key']
+  end
 
+  def test_spec_nested_subsections_added
+    d = create_driver NESTED_CONF
     conf = d.instance.spec('zz')
+
     assert_equal 'xxxxxx', conf['keyx']
     assert_equal 'yyyyyy.zz', conf['keyy']
     assert_equal 'z3', conf['keyz']
     assert_equal 'd.zz', conf['alt_key']
+
     assert_equal 7, conf.elements.size
+
     assert_equal 'tagz', conf.elements[0].name
     assert_equal 1, conf.elements[0].elements.size
     assert_equal 'tagw', conf.elements[0].elements[0].name
     assert_equal 'www', conf.elements[0].elements[0]['key']
+
     assert_equal 'tag_with', conf.elements[1].name
     assert_equal 'attr.*', conf.elements[1].arg
     assert_equal 'not_overwrite', conf.elements[1]['key']
+
     assert_equal 'tagx', conf.elements[2].name
     assert_equal 'xxx', conf.elements[2]['key']
+
     assert_equal 'tagy', conf.elements[3].name
     assert_equal 'yyy.zz', conf.elements[3]['key']
+
     assert_equal 'tag_with', conf.elements[4].name
     assert_equal 'attr.foo', conf.elements[4].arg
     assert_equal 'bar', conf.elements[4]['key']
+
     assert_equal 'tag_with', conf.elements[5].name
     assert_equal 'attr.foo', conf.elements[5].arg
     assert_equal 'dup', conf.elements[5]['key']
+
     assert_equal 'tag_with', conf.elements[6].name
     assert_equal 'attr.foo', conf.elements[6].arg
     assert_equal 'dupdup', conf.elements[6]['key']
