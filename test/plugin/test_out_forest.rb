@@ -12,7 +12,7 @@ remove_prefix test
 <template>
   key_name f
   suffix !
-  tag out.__TAG__  
+  tag out.__TAG__
 </template>
 <case foo.bar>
   prefix p1:
@@ -62,7 +62,7 @@ subtype hoge
     assert_equal 'yyyyyy.xx', conf['keyy']
     assert_equal 'z1', conf['keyz']
     assert_equal 'b', conf['alt_key']
-    
+
     conf = d.instance.spec('yy')
     assert_equal 'xxxxxx', conf['keyx']
     assert_equal 'yyyyyy.yy', conf['keyy']
@@ -154,7 +154,7 @@ subtype hoge
     assert_equal 'tag_with', conf.elements[4].name
     assert_equal 'attr.foo', conf.elements[4].arg
     assert_equal 'dupdup', conf.elements[4]['key']
-    
+
     conf = d.instance.spec('yy')
     assert_equal 'xxxxxx', conf['keyx']
     assert_equal 'yyyyyy.yy', conf['keyy']
@@ -229,7 +229,7 @@ hostname somehost.local
     assert_equal 'yyyyyy.xx', conf['keyy']
     assert_equal 'z1', conf['keyz']
     assert_equal 'b', conf['alt_key']
-    
+
     conf = d.instance.spec('yy')
     assert_equal 'xxxxxx.somehost.local', conf['keyx']
     assert_equal 'yyyyyy.yy', conf['keyy']
@@ -276,7 +276,7 @@ subtype hoge
     assert_equal 'yyyyyy.xx', conf['keyy']
     assert_equal 'z1', conf['keyz']
     assert_equal 'b', conf['alt_key']
-    
+
     conf = d.instance.spec('yy')
     assert_equal 'xxxxxx.' + hostname, conf['keyx']
     assert_equal 'yyyyyy.yy', conf['keyy']
@@ -309,7 +309,7 @@ remove_prefix test
 <template>
   key_name f
   suffix !
-  tag __TAG__  
+  tag __TAG__
 </template>
 <case foo.bar>
   prefix p1:
@@ -349,7 +349,7 @@ remove_prefix test
     assert_equal time, e[1]
     assert_equal "p4:message 1!", e[2]['f']
     assert_nil e[2]['not_started']
-    
+
     e = emits[1]
     assert_equal 'out.second', e[0]
     assert_equal time, e[1]

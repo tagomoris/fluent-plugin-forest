@@ -47,7 +47,7 @@ suffix :end
     assert_equal 'test', emits[1][2]['ttt']
   end
 
-  def test_emit
+  def test_emit1
     d = create_driver
     time = Time.parse("2012-01-02 13:14:15").to_i
     d.run do
