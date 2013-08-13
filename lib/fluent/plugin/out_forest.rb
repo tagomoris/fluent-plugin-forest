@@ -59,15 +59,15 @@ class Fluent::ForestOutput < Fluent::MultiOutput
     end
   end
 
-  def parameter(tag, e, name = 'instance')
+  def parameter(tag, e, name = 'instance', arg = '')
     pairs = {}
     e.each do |k,v|
       pairs[k] = v.gsub('__TAG__', tag).gsub('${tag}', tag).gsub('__HOSTNAME__', @hostname).gsub('${hostname}', @hostname)
     end
     elements = e.elements.map do |child|
-      parameter(tag, child, child.name)
+      parameter(tag, child, child.name, child.arg)
     end
-    Fluent::Config::Element.new(name, '', pairs, elements)
+    Fluent::Config::Element.new(name, arg, pairs, elements)
   end
 
   def spec(tag)
@@ -75,7 +75,17 @@ class Fluent::ForestOutput < Fluent::MultiOutput
     conf = parameter(tag, @template) + conf if @template # a + b -> b.merge(a) (see: fluentd/lib/fluent/config.rb)
     @cases.each do |m,e|
       if m.match(tag)
-        conf = parameter(tag, e) + conf
+        matched_case = parameter(tag, e)
+
+        matched_case.elements.each { |case_child|
+          unless case_child.arg.empty?
+            conf.elements.delete_if { |conf_child|
+              conf_child.name == case_child.name && conf_child.arg == case_child.arg
+            }
+          end
+        }
+
+        conf = matched_case + conf
         break
       end
     end
