@@ -98,7 +98,7 @@ If you want to place logs /var/archive for `service.search.**` as filename with 
       </case>
     </match>
 
-Current version of this plugin doesn't support subsections in `<template>` and `<case>`. This doesn't works as we expect.
+Version 0.2.0 or later, subsections adding/overwriting are supported. About the case below, three `<store>` subsections are defined for `search.**` pattern.
 
     <match service.*>
       type forest
@@ -121,11 +121,36 @@ Current version of this plugin doesn't support subsections in `<template>` and `
       </case>
     </match>
 
-For copy+forest pattern, you can use `fluent-plugin-forest` in `<store>` section of out\_copy. (except for variable numbers of `<store>` sections.)
+Subsections with same arguments will be overwritten. See this example:
+
+    <match service.*>
+      type forest
+      subtype route
+      <template>
+        <route {search,admin}.a>
+          add_prefix first
+        </route>
+        <route {search,admin}.b>
+          add_prefix second
+        </route>
+        <route {search,admin}.c>
+          add_prefix third
+        </route>
+        <route {search,admin}.*>
+          add_prefix extra
+        </route>
+      </template>
+      <case admin.*>
+        <route {search,admin}.*>
+          add_prefix other
+        </route>
+      </case>
+    </match>
+
+In this case, `<route {search,admin}.*>` subsection will be overwritten to add prefix 'other' for tag `service.admin.*`.
 
 ## TODO
 
-* Subsections support in `<template>` and `<case>`
 * patches welcome!
 
 ## Copyright
