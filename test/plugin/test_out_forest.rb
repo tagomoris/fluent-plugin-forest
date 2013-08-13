@@ -101,6 +101,9 @@ subtype hoge
   <tag_with attr.foo>
     key dup
   </tag_with>
+  <tag_with attr.foo>
+    key dupdup
+  </tag_with>
 </template>
 <case xx>
   keyz z1
@@ -114,6 +117,9 @@ subtype hoge
   </tagx>
   <tag_with attr.foo>
     key overwrite
+  </tag_with>
+  <tag_with attr.foo>
+    key overwrite_dup
   </tag_with>
 </case>
 <case *>
@@ -134,7 +140,7 @@ subtype hoge
     assert_equal 'yyyyyy.xx', conf['keyy']
     assert_equal 'z1', conf['keyz']
     assert_equal 'b', conf['alt_key']
-    assert_equal 4, conf.elements.size
+    assert_equal 5, conf.elements.size
     assert_equal 'tagx', conf.elements[0].name
     assert_equal 'xxx', conf.elements[0]['key']
     assert_equal 'tagy', conf.elements[1].name
@@ -145,29 +151,35 @@ subtype hoge
     assert_equal 'tag_with', conf.elements[3].name
     assert_equal 'attr.foo', conf.elements[3].arg
     assert_equal 'dup', conf.elements[3]['key']
+    assert_equal 'tag_with', conf.elements[4].name
+    assert_equal 'attr.foo', conf.elements[4].arg
+    assert_equal 'dupdup', conf.elements[4]['key']
     
     conf = d.instance.spec('yy')
     assert_equal 'xxxxxx', conf['keyx']
     assert_equal 'yyyyyy.yy', conf['keyy']
     assert_equal 'z2', conf['keyz']
     assert_equal 'c', conf['alt_key']
-    assert_equal 4, conf.elements.size
+    assert_equal 5, conf.elements.size
     assert_equal 'tagx', conf.elements[0].name
     assert_equal 'not_overwrite', conf.elements[0]['key']
     assert_equal 'tag_with', conf.elements[1].name
     assert_equal 'attr.foo', conf.elements[1].arg
     assert_equal 'overwrite', conf.elements[1]['key']
-    assert_equal 'tagx', conf.elements[2].name
-    assert_equal 'xxx', conf.elements[2]['key']
-    assert_equal 'tagy', conf.elements[3].name
-    assert_equal 'yyy.yy', conf.elements[3]['key']
+    assert_equal 'tag_with', conf.elements[2].name
+    assert_equal 'attr.foo', conf.elements[2].arg
+    assert_equal 'overwrite_dup', conf.elements[2]['key']
+    assert_equal 'tagx', conf.elements[3].name
+    assert_equal 'xxx', conf.elements[3]['key']
+    assert_equal 'tagy', conf.elements[4].name
+    assert_equal 'yyy.yy', conf.elements[4]['key']
 
     conf = d.instance.spec('zz')
     assert_equal 'xxxxxx', conf['keyx']
     assert_equal 'yyyyyy.zz', conf['keyy']
     assert_equal 'z3', conf['keyz']
     assert_equal 'd.zz', conf['alt_key']
-    assert_equal 6, conf.elements.size
+    assert_equal 7, conf.elements.size
     assert_equal 'tagz', conf.elements[0].name
     assert_equal 1, conf.elements[0].elements.size
     assert_equal 'tagw', conf.elements[0].elements[0].name
@@ -185,6 +197,9 @@ subtype hoge
     assert_equal 'tag_with', conf.elements[5].name
     assert_equal 'attr.foo', conf.elements[5].arg
     assert_equal 'dup', conf.elements[5]['key']
+    assert_equal 'tag_with', conf.elements[6].name
+    assert_equal 'attr.foo', conf.elements[6].arg
+    assert_equal 'dupdup', conf.elements[6]['key']
   end
 
   def test_spec_hostname
