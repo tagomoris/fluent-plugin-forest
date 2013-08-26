@@ -7,6 +7,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{create sub-plugin dynamically per tags, with template configuration and parameters}
   gem.summary       = %q{plugin to create output plugin instances per tags dynamically}
   gem.homepage      = "https://github.com/tagomoris/fluent-plugin-forest"
+  gem.license       = "APLv2"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
