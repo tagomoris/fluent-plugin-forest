@@ -12,6 +12,8 @@ This plugin helps you if you are writing very long configurations by copy&paste 
 Other supported placeholders:
 * \_\_HOSTNAME\_\_ (or ${hostname})
   * replaced with string specified by 'hostname' configuration value, or (default) result of 'hostname' command
+* \_\_ESCAPED\_TAG\_\_ (or ${escaped\_tag})
+  * replaced with escaped tag. Escaped tag is replaced '.' with a character specified by 'escape\_tag\_separator' (default: '\_')
 
 You SHOULD NOT use ForestOutput for tags increasing infinitly. 
 

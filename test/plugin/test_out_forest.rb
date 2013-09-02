@@ -231,6 +231,60 @@ subtype hoge
     assert_equal 'dupdup', conf.elements[6]['key']
   end
 
+  def test_spec_replace_tag_separator
+    d = create_driver %[
+subtype hoge
+<template>
+  keyx xxxxxx
+  keyy yyyyyy.__ESCAPED_TAG__
+</template>
+<case xx.*>
+  keyz zzzzzz.__ESCAPED_TAG__
+  alt_key a
+</case>
+<case xx.**>
+  keyz zzzzzz.${escaped_tag}
+  alt_key b
+</case>
+    ]
+
+    conf = d.instance.spec('xx.1')
+    assert_equal 'xxxxxx', conf['keyx']
+    assert_equal 'yyyyyy.xx_1', conf['keyy']
+    assert_equal 'zzzzzz.xx_1', conf['keyz']
+    assert_equal 'a', conf['alt_key']
+
+    conf = d.instance.spec('xx.1.2')
+    assert_equal 'xxxxxx', conf['keyx']
+    assert_equal 'yyyyyy.xx_1_2', conf['keyy']
+    assert_equal 'zzzzzz.xx_1_2', conf['keyz']
+    assert_equal 'b', conf['alt_key']
+  end
+
+  def test_spec_replace_tag_separator_with_specified_char
+    d = create_driver %[
+subtype hoge
+escape_tag_separator +
+<template>
+  keyx xxxxxx
+  keyy yyyyyy.__ESCAPED_TAG__
+</template>
+<case xx.**>
+  keyz zzzzzz.${escaped_tag}
+</case>
+    ]
+
+    conf = d.instance.spec('xx.1')
+    assert_equal 'xxxxxx', conf['keyx']
+    assert_equal 'yyyyyy.xx+1', conf['keyy']
+    assert_equal 'zzzzzz.xx+1', conf['keyz']
+
+    conf = d.instance.spec('xx.1.2')
+    assert_equal 'xxxxxx', conf['keyx']
+    assert_equal 'yyyyyy.xx+1+2', conf['keyy']
+    assert_equal 'zzzzzz.xx+1+2', conf['keyz']
+  end
+
   def test_spec_hostname
     d = create_driver %[
 subtype hoge

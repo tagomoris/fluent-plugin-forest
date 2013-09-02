@@ -5,6 +5,7 @@ class Fluent::ForestOutput < Fluent::MultiOutput
   config_param :remove_prefix, :string, :default => nil
   config_param :add_prefix, :string, :default => nil
   config_param :hostname, :string, :default => `hostname`.chomp
+  config_param :escape_tag_separator, :string, :default => '_'
 
   attr_reader :outputs
 
@@ -60,8 +61,10 @@ class Fluent::ForestOutput < Fluent::MultiOutput
   end
 
   def parameter(tag, e, name = 'instance', arg = '')
+    escaped_tag = tag.gsub('.', @escape_tag_separator)
     pairs = {}
     e.each do |k,v|
+      v = v.gsub('__ESCAPED_TAG__', escaped_tag).gsub('${escaped_tag}', escaped_tag)
       pairs[k] = v.gsub('__TAG__', tag).gsub('${tag}', tag).gsub('__HOSTNAME__', @hostname).gsub('${hostname}', @hostname)
     end
     elements = e.elements.map do |child|
