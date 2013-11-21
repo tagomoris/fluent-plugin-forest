@@ -61,9 +61,15 @@ class Fluent::ForestOutput < Fluent::MultiOutput
   end
 
   def parameter(tag, e, name = 'instance', arg = '')
+    tag_parts = {}
+    tag.split('.').each_with_index do |t, idx| 
+      tag_parts["${tag_parts[#{idx}]}"] = t
+      tag_parts["__TAG_PARTS[#{idx}]__"] = t
+    end
     escaped_tag = tag.gsub('.', @escape_tag_separator)
     pairs = {}
     e.each do |k,v|
+      v = v.gsub(/__TAG_PARTS\[[0-9]+\]__/, tag_parts).gsub(/\${tag_parts\[[0-9]+\]}/, tag_parts)
       v = v.gsub('__ESCAPED_TAG__', escaped_tag).gsub('${escaped_tag}', escaped_tag)
       pairs[k] = v.gsub('__TAG__', tag).gsub('${tag}', tag).gsub('__HOSTNAME__', @hostname).gsub('${hostname}', @hostname)
     end
