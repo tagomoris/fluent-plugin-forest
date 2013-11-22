@@ -32,6 +32,12 @@ class Fluent::ForestOutput < Fluent::MultiOutput
       # read and throw away to supress unread configuration warning
       touch_recursive(element)
 
+      element.each do |k,v|
+        unless v.match(/\$\{tag_parts\[\d\.\.\.?\d\]\}/).nil? or v.match(/__TAG_PARTS\[\d\.\.\.?\d\]__/).nil?
+          raise Fluent::ConfigError, "${tag_parts[n]} and __TAG_PARTS[n]__ placeholder does not support range specify at #{k} #{v}"
+        end
+      end
+
       case element.name
       when 'template'
         @template = element
@@ -69,7 +75,10 @@ class Fluent::ForestOutput < Fluent::MultiOutput
     escaped_tag = tag.gsub('.', @escape_tag_separator)
     pairs = {}
     e.each do |k,v|
-      v = v.gsub(/__TAG_PARTS\[[0-9]+\]__/, tag_parts).gsub(/\${tag_parts\[[0-9]+\]}/, tag_parts)
+      v = v.gsub(/(__TAG_PARTS\[[0-9]+\]__|\${tag_parts\[[0-9]+\]})/) do 
+        $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{$1} conf:#{k} #{v}" unless tag_parts.include?($1)
+        tag_parts[$1]
+      end
       v = v.gsub('__ESCAPED_TAG__', escaped_tag).gsub('${escaped_tag}', escaped_tag)
       pairs[k] = v.gsub('__TAG__', tag).gsub('${tag}', tag).gsub('__HOSTNAME__', @hostname).gsub('${hostname}', @hostname)
     end

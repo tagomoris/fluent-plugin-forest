@@ -286,12 +286,20 @@ escape_tag_separator +
   end
 
   def test_spec_split_tag_by_dot
+    assert_raise(Fluent::ConfigError) {
+      d = create_driver %[
+        subtype hoge
+        <template>
+          keyx ${tag_parts[0..2]}.__TAG_PARTS[0..2]__
+        </template>
+      ]
+    }
     d = create_driver %[
 subtype hoge
 <template>
   keyx xxxxxx
   keyy yyyyyy.${tag_parts[0]}
-  unknown_tag_parts bar.${tag_parts[999]}.__TAG_PARTS[999]__
+  unknown_tag_parts bar${tag_parts[999]}__TAG_PARTS[999]__
 </template>
 <case xx.*>
   keyz zzzzzz.${tag_parts[0]}.${tag_parts[1]}
@@ -307,7 +315,7 @@ subtype hoge
     assert_equal 'xxxxxx', conf['keyx']
     assert_equal 'yyyyyy.xx', conf['keyy']
     assert_equal 'zzzzzz.xx.1', conf['keyz']
-    assert_equal 'bar..', conf['unknown_tag_parts']
+    assert_equal 'bar', conf['unknown_tag_parts']
     assert_equal 'a', conf['alt_key']
 
     conf = d.instance.spec('xx.1.2')
