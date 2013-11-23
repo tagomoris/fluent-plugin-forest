@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |gem|
   gem.name          = "fluent-plugin-forest"
-  gem.version       = "0.2.1"
+  gem.version       = "0.2.2"
   gem.authors       = ["TAGOMORI Satoshi"]
   gem.email         = ["tagomoris@gmail.com"]
   gem.description   = %q{create sub-plugin dynamically per tags, with template configuration and parameters}
