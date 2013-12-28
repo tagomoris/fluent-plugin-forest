@@ -285,43 +285,79 @@ escape_tag_separator +
     assert_equal 'zzzzzz.xx+1+2', conf['keyz']
   end
 
-  def test_spec_split_tag_by_dot
-    assert_raise(Fluent::ConfigError) {
-      d = create_driver %[
-        subtype hoge
-        <template>
-          keyx ${tag_parts[0..2]}.__TAG_PARTS[0..2]__
-        </template>
-      ]
-    }
+  def test_spec_split_tag_by_dot_with_int_index
     d = create_driver %[
 subtype hoge
 <template>
-  keyx xxxxxx
-  keyy yyyyyy.${tag_parts[0]}
+  keya aaaaaa
+  keyb bbbbbb.${tag_parts[0]}
   unknown_tag_parts bar${tag_parts[999]}__TAG_PARTS[999]__
 </template>
 <case xx.*>
-  keyz zzzzzz.${tag_parts[0]}.${tag_parts[1]}
+  keyc cccccc.${tag_parts[0]}.${tag_parts[1]}
+  keyd dddddd.${tag_parts[-2]}.${tag_parts[-1]}
   alt_key a
 </case>
 <case xx.**>
-  keyz zzzzzz.__TAG_PARTS[0]__.__TAG_PARTS[2]__
+  keyc cccccc.__TAG_PARTS[0]__.__TAG_PARTS[2]__
+  keyd dddddd.__TAG_PARTS[-2]__.__TAG_PARTS[-1]__
   alt_key b
 </case>
     ]
 
     conf = d.instance.spec('xx.1')
-    assert_equal 'xxxxxx', conf['keyx']
-    assert_equal 'yyyyyy.xx', conf['keyy']
-    assert_equal 'zzzzzz.xx.1', conf['keyz']
+    assert_equal 'aaaaaa', conf['keya']
+    assert_equal 'bbbbbb.xx', conf['keyb']
+    assert_equal 'cccccc.xx.1', conf['keyc']
+    assert_equal 'dddddd.xx.1', conf['keyd']
     assert_equal 'bar', conf['unknown_tag_parts']
     assert_equal 'a', conf['alt_key']
 
     conf = d.instance.spec('xx.1.2')
-    assert_equal 'xxxxxx', conf['keyx']
-    assert_equal 'yyyyyy.xx', conf['keyy']
-    assert_equal 'zzzzzz.xx.2', conf['keyz']
+    assert_equal 'aaaaaa', conf['keya']
+    assert_equal 'bbbbbb.xx', conf['keyb']
+    assert_equal 'cccccc.xx.2', conf['keyc']
+    assert_equal 'dddddd.1.2', conf['keyd']
+    assert_equal 'b', conf['alt_key']
+  end
+
+  def test_spec_split_tag_by_dot_with_range_index
+    d = create_driver %[
+subtype hoge
+<template>
+  keya aaaaaa
+  keyb bbbbbb.${tag_parts[0]}
+  unknown_tag_parts bar${tag_parts[999..1000]}__TAG_PARTS[999...1001]__
+</template>
+<case xx.*>
+  keyc cccccc.${tag_parts[0..1]}
+  keyd dddddd.${tag_parts[-2..-1]}
+  keye eeeeee.${tag_parts[1..1000]}
+  alt_key a
+</case>
+<case xx.**>
+  keyc cccccc.__TAG_PARTS[1...3]__
+  keyd dddddd.__TAG_PARTS[-3...-1]__
+  keye eeeeee.__TAG_PARTS[1...1000]__
+  alt_key b
+</case>
+    ]
+
+    conf = d.instance.spec('xx.1')
+    assert_equal 'aaaaaa', conf['keya']
+    assert_equal 'bbbbbb.xx', conf['keyb']
+    assert_equal 'cccccc.xx.1', conf['keyc']
+    assert_equal 'dddddd.xx.1', conf['keyd']
+    assert_equal 'eeeeee.1', conf['keye']
+    assert_equal 'bar', conf['unknown_tag_parts']
+    assert_equal 'a', conf['alt_key']
+
+    conf = d.instance.spec('xx.1.2')
+    assert_equal 'aaaaaa', conf['keya']
+    assert_equal 'bbbbbb.xx', conf['keyb']
+    assert_equal 'cccccc.1.2', conf['keyc']
+    assert_equal 'dddddd.xx.1', conf['keyd']
+    assert_equal 'eeeeee.1.2', conf['keye']
     assert_equal 'b', conf['alt_key']
   end
 
