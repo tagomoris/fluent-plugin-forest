@@ -15,7 +15,8 @@ Other supported placeholders:
 * \_\_ESCAPED\_TAG\_\_ (or ${escaped\_tag})
   * replaced with escaped tag. Escaped tag is replaced '.' with a character specified by 'escape\_tag\_separator' (default: '\_')
 * \_\_TAG_PARTS[n]\_\_ (or ${tag_parts[n]})
-  * it acts accessing the index which split the tag with '.' (dot). It will get 'td' by ${tag_parts[0]} and 'apache' by ${tag_parts[1]} when the tag was `td.apache.access`.
+  * it acts accessing the index which split the tag with '.' (dot). It will get 'td' by ${tag_parts[0]}, 'apache' by ${tag_parts[1]} and 'access' by ${tag_parts[-1]} when the tag was `td.apache.access`.
+  * you can also use range index like '1..4' or '1...3' (e.g. ${tag_parts[1..-1]} will return 'apache.access' on giving tag same as previous.)
 
 You SHOULD NOT use ForestOutput for tags increasing infinitly. 
 
