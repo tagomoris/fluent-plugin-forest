@@ -74,7 +74,7 @@ class Fluent::ForestOutput < Fluent::MultiOutput
       v = v.gsub(/__TAG_PARTS\[(?<idx>-?[0-9]+)\]__|\${tag_parts\[(?<idx>-?[0-9]+)\]}/) do 
         idx = $~[:idx].to_i
         if tag_parts[idx]
-          tag_parts[$~[:idx].to_i]
+          tag_parts[idx]
         else
           $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{idx} conf:#{k} #{v}"
           nil
