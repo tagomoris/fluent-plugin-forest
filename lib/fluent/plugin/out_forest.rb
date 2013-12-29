@@ -71,29 +71,22 @@ class Fluent::ForestOutput < Fluent::MultiOutput
     escaped_tag = tag.gsub('.', @escape_tag_separator)
     pairs = {}
     e.each do |k,v|
-      v = v.gsub(/__TAG_PARTS\[(?<idx>-?[0-9]+)\]__|\${tag_parts\[(?<idx>-?[0-9]+)\]}/) do 
-        idx = $~[:idx].to_i
-        if tag_parts[idx]
-          tag_parts[idx]
+      v = v.gsub(/__TAG_PARTS\[(?<idx>-?[0-9]+(?:\.\.\.?-?[0-9]+)?)\]__|\$\{tag_parts\[(?<idx>-?[0-9]+(?:\.\.\.?-?[0-9]+)?\])\}/) do
+        idx = $~[:idx]
+        if idx =~ /(?<start>-?[0-9]+)\.\.(?<rangetype>\.)?(?<end>-?[0-9]+)/
+          range_start = $~[:start].to_i
+          rangetype = $~[:rangetype]
+          range_end = $~[:end].to_i
+          range = (rangetype)? Range.new(range_start, range_end-1): Range.new(range_start, range_end)
+          if tag_parts[range]
+            tag_parts[range].join(".")
+          else
+            $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{idx} conf:#{k} #{v}"
+            nil
+          end
         else
-          $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{idx} conf:#{k} #{v}"
-          nil
-        end
-      end
-      v = v.gsub(/__TAG_PARTS\[(?<range>-?[0-9]+\.\.\.?-?[0-9]+)\]__|\${tag_parts\[(?<range>-?[0-9]+\.\.\.?-?[0-9]+)\]}/) do 
-        range = $~[:range].split("..")
-        range[0] = range[0].to_i
-        range[1] = if range[1][0] == "."
-                     range[1][1..-1].to_i - 1
-                   else
-                     range[1].to_i
-                   end
-        range = Range.new(*range)
-        if tag_parts[range]
-          tag_parts[range].join(".")
-        else
-          $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{range} conf:#{k} #{v}"
-          nil
+          $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{idx} conf:#{k} #{v}" unless tag_parts[idx.to_i]
+          tag_parts[idx.to_i]
         end
       end
       v = v.gsub('__ESCAPED_TAG__', escaped_tag).gsub('${escaped_tag}', escaped_tag)
