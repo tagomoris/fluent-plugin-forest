@@ -32,12 +32,6 @@ class Fluent::ForestOutput < Fluent::MultiOutput
       # read and throw away to supress unread configuration warning
       touch_recursive(element)
 
-      element.each do |k,v|
-        unless v.match(/\$\{tag_parts\[\d\.\.\.?\d\]\}/).nil? or v.match(/__TAG_PARTS\[\d\.\.\.?\d\]__/).nil?
-          raise Fluent::ConfigError, "${tag_parts[n]} and __TAG_PARTS[n]__ placeholder does not support range specify at #{k} #{v}"
-        end
-      end
-
       case element.name
       when 'template'
         @template = element
