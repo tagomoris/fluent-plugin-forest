@@ -61,26 +61,29 @@ class Fluent::ForestOutput < Fluent::MultiOutput
   end
 
   def parameter(tag, e, name = 'instance', arg = '')
-    tag_parts = tag.split('.') 
+    tag_parts = tag.split('.')
     escaped_tag = tag.gsub('.', @escape_tag_separator)
     pairs = {}
     e.each do |k,v|
-      v = v.gsub(/__TAG_PARTS\[(?<idx>-?[0-9]+(?:\.\.\.?-?[0-9]+)?)\]__|\$\{tag_parts\[(?<idx>-?[0-9]+(?:\.\.\.?-?[0-9]+)?\])\}/) do
-        idx = $~[:idx]
-        if idx =~ /(?<start>-?[0-9]+)\.\.(?<rangetype>\.)?(?<end>-?[0-9]+)/
-          range_start = $~[:start].to_i
-          rangetype = $~[:rangetype]
-          range_end = $~[:end].to_i
-          range = (rangetype)? Range.new(range_start, range_end-1): Range.new(range_start, range_end)
+      v = v.gsub(/__TAG_PARTS\[-?[0-9]+(?:\.\.\.?-?[0-9]+)?\]__|\$\{tag_parts\[-?[0-9]+(?:\.\.\.?-?[0-9]+)?\]\}/) do |tag_parts_matched|
+        matched = /\[(?<first>-?[0-9]+)(?<range_part>(?<range_type>\.\.\.?)(?<last>-?[0-9]+))?\]/.match(tag_parts_matched)
+        if matched && matched[:range_part]
+          exclude_end = (matched[:range_type] == '...')
+          range = Range.new(matched[:first].to_i, matched[:last].to_i, exclude_end)
           if tag_parts[range]
             tag_parts[range].join(".")
           else
-            $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{idx} conf:#{k} #{v}"
+            $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{tag_parts_matched} conf:#{k} #{v}"
             nil
           end
+        elsif matched # non range index (without range_part)
+          index = matched[:first].to_i
+          unless tag_parts[index]
+            $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{tag_parts_matched} conf:#{k} #{v}"
+          end
+          tag_parts[index]
         else
-          $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{idx} conf:#{k} #{v}" unless tag_parts[idx.to_i]
-          tag_parts[idx.to_i]
+          raise "BUG: gsub regex matches but index regex does not match"
         end
       end
       v = v.gsub('__ESCAPED_TAG__', escaped_tag).gsub('${escaped_tag}', escaped_tag)
