@@ -1,4 +1,6 @@
-# fluent-plugin-forest, a plugin for [Fluentd](http://fluentd.org)
+# fluent-plugin-forest
+
+This is a plugin for [Fluentd](http://fluentd.org).
 
 ## Component
 
