@@ -1,5 +1,7 @@
 # fluent-plugin-forest
 
+This is a plugin for [Fluentd](http://fluentd.org).
+
 ## Component
 
 ### ForestOutput
