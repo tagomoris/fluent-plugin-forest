@@ -9,6 +9,11 @@ class Fluent::ForestOutput < Fluent::MultiOutput
 
   attr_reader :outputs
 
+  # Define `log` method for v0.10.42 or earlier
+  unless method_defined?(:log)
+    define_method("log") { $log }
+  end
+
   def configure(conf)
     super
 
@@ -75,13 +80,13 @@ class Fluent::ForestOutput < Fluent::MultiOutput
           if tag_parts[range]
             tag_parts[range].join(".")
           else
-            $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{tag_parts_matched} conf:#{k} #{v}"
+            log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{tag_parts_matched} conf:#{k} #{v}"
             nil
           end
         else # non range index (without range_part)
           index = matched[:first].to_i
           unless tag_parts[index]
-            $log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{tag_parts_matched} conf:#{k} #{v}"
+            log.warn "out_forest: missing placeholder. tag:#{tag} placeholder:#{tag_parts_matched} conf:#{k} #{v}"
           end
           tag_parts[index]
         end
@@ -130,16 +135,16 @@ class Fluent::ForestOutput < Fluent::MultiOutput
           @outputs.push(output)
         end
       }
-      $log.info "out_forest plants new output: #{@subtype} for tag '#{tag}'"
+      log.info "out_forest plants new output: #{@subtype} for tag '#{tag}'"
     rescue Fluent::ConfigError => e
-      $log.error "failed to configure sub output #{@subtype}: #{e.message}"
-      $log.error e.backtrace.join("\n")
-      $log.error "Cannot output messages with tag '#{tag}'"
+      log.error "failed to configure sub output #{@subtype}: #{e.message}"
+      log.error e.backtrace.join("\n")
+      log.error "Cannot output messages with tag '#{tag}'"
       output = nil
     rescue StandardError => e
-      $log.error "failed to configure/start sub output #{@subtype}: #{e.message}"
-      $log.error e.backtrace.join("\n")
-      $log.error "Cannot output messages with tag '#{tag}'"
+      log.error "failed to configure/start sub output #{@subtype}: #{e.message}"
+      log.error e.backtrace.join("\n")
+      log.error "Cannot output messages with tag '#{tag}'"
       output = nil
     end
     output
