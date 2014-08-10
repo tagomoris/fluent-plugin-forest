@@ -156,6 +156,10 @@ Subsections with same arguments will be overwritten. See this example:
 
 In this case, `<route {search,admin}.*>` subsection will be overwritten to add prefix 'other' for tag `service.admin.*`.
 
+### For Configuration DSL
+
+In DSL configurations, `case` is reserved by Ruby itself. Use `pattern` instead of `case`. `pattern` works just as same as `case`. (`v0.3.0` or later.)
+
 ## TODO
 
 * patches welcome!
