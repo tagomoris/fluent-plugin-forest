@@ -40,7 +40,7 @@ class Fluent::ForestOutput < Fluent::MultiOutput
       case element.name
       when 'template'
         @template = element
-      when 'case'
+      when 'case', 'pattern'
         matcher = Fluent::GlobMatchPattern.new(element.arg)
         @cases.push([matcher, element])
       end
