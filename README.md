@@ -7,7 +7,7 @@ This is a plugin for [Fluentd](http://fluentd.org).
 ### ForestOutput
 
 ForestOutput creates sub plugin instance of a output plugin dynamically per tag, from template configurations.
-In template configurations, you can write configuration lines for overall tags by <template>, and for specified tags by <case TAG_PATTERN>, and you can use \_\_TAG\_\_ (or ${tag}) placeholder at anywhere in <template> and <case>.
+In template configurations, you can write configuration lines for overall tags by `<template>`, and for specified tags by `<case TAG_PATTERN>`, and you can use \_\_TAG\_\_ (or ${tag}) placeholder at anywhere in `<template>` and `<case>`.
 
 This plugin helps you if you are writing very long configurations by copy&paste with a little little diff for many tags.
 
