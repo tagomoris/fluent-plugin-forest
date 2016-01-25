@@ -31,25 +31,25 @@ You SHOULD NOT use ForestOutput for tags increasing infinitly.
 If you are writing long long configurations like below:
 
     <match service.blog>
-      type file
+      @type file
       time_slice_format %Y%m%d%H
       compress yes
       path /var/log/blog.*.log
     </match>
     <match service.portal>
-      type file
+      @type file
       time_slice_format %Y%m%d%H
       compress yes
       path /var/log/portal.*.log
     </match>
     <match service.news>
-      type file
+      @type file
       time_slice_format %Y%m%d%H
       compress yes
       path /var/log/news.*.log
     </match>
     <match service.sns>
-      type file
+      @type file
       time_slice_format %Y%m%d%H
       compress yes
       path /var/log/sns.*.log
@@ -59,7 +59,7 @@ If you are writing long long configurations like below:
 You can write configuration with ForestOutput like below:
 
     <match service.*>
-      type forest
+      @type forest
       subtype file
       remove_prefix service
       <template>
@@ -72,7 +72,7 @@ You can write configuration with ForestOutput like below:
 If you want to place logs /var/archive for `service.search.**` as filename with hostname, without compression, `case` directive is useful:
 
     <match service.*>
-      type forest
+      @type forest
       subtype file
       remove_prefix service
       <template>
@@ -91,7 +91,7 @@ If you want to place logs /var/archive for `service.search.**` as filename with 
 `case` configuration overwrites `template` configuration, so you can also write like this:
 
     <match service.*>
-      type forest
+      @type forest
       subtype file
       remove_prefix service
       <template>
@@ -108,7 +108,7 @@ If you want to place logs /var/archive for `service.search.**` as filename with 
 Version 0.2.0 or later, subsections adding/overwriting are supported. About the case below, three `<store>` subsections are defined for `search.**` pattern.
 
     <match service.*>
-      type forest
+      @type forest
       subtype copy
       <template>
         <store>
@@ -131,7 +131,7 @@ Version 0.2.0 or later, subsections adding/overwriting are supported. About the 
 Subsections with same arguments will be overwritten. See this example:
 
     <match service.*>
-      type forest
+      @type forest
       subtype route
       <template>
         <route {search,admin}.a>
