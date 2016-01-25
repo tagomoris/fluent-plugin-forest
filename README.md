@@ -112,17 +112,17 @@ Version 0.2.0 or later, subsections adding/overwriting are supported. About the 
       subtype copy
       <template>
         <store>
-          type file
+          @type file
           path /path/to/copy1
         </store>
         <store>
-          type file
+          @type file
           path /path/to/copy2
         </store>
       </template>
       <case search.**>
         <store>
-          type file
+          @type file
           path /path/to/copy3
         </store>
       </case>
