@@ -33,25 +33,25 @@ If you are writing long long configurations like below:
     <match service.blog>
       @type file
       time_slice_format %Y%m%d%H
-      compress yes
+      compress gz
       path /var/log/blog.*.log
     </match>
     <match service.portal>
       @type file
       time_slice_format %Y%m%d%H
-      compress yes
+      compress gz
       path /var/log/portal.*.log
     </match>
     <match service.news>
       @type file
       time_slice_format %Y%m%d%H
-      compress yes
+      compress gz
       path /var/log/news.*.log
     </match>
     <match service.sns>
       @type file
       time_slice_format %Y%m%d%H
-      compress yes
+      compress gz
       path /var/log/sns.*.log
     </match>
     # ...
@@ -64,7 +64,7 @@ You can write configuration with ForestOutput like below:
       remove_prefix service
       <template>
         time_slice_format %Y%m%d%H
-        compress yes
+        compress gz
         path /var/log/${tag}.*.log
       </template>
     </match>
@@ -79,11 +79,10 @@ If you want to place logs /var/archive for `service.search.**` as filename with 
         time_slice_format %Y%m%d%H
       </template>
       <case search.**>
-        compress no
         path /var/archive/__TAG__.__HOSTNAME__.*.log
       </case>
       <case *>
-        compress yes
+        compress gz
         path /var/log/__TAG__.*.log
       </case>
     </match>
@@ -96,11 +95,10 @@ If you want to place logs /var/archive for `service.search.**` as filename with 
       remove_prefix service
       <template>
         time_slice_format %Y%m%d%H
-        compress yes
+        compress gz
         path /var/log/__TAG__.*.log
       </template>
       <case search.**>
-        compress no
         path /var/archive/__TAG__.*.log
       </case>
     </match>
