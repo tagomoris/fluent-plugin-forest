@@ -36,7 +36,7 @@ class Fluent::ForestTestOutput < Fluent::Output
       if @tagfield
         r[@tagfield] = tag
       end
-      Fluent::Engine.emit(@tag, time, r)
+      router.emit(@tag, time, r)
     }
     chain.next
   end
