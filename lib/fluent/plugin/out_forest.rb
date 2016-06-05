@@ -141,7 +141,7 @@ class Fluent::ForestOutput < Fluent::MultiOutput
       log.error e.backtrace.join("\n")
       log.error "Cannot output messages with tag '#{tag}'"
       output = nil
-    rescue StandardError => e
+    rescue StandardError, ScriptError => e
       log.error "failed to configure/start sub output #{@subtype}: #{e.message}"
       log.error e.backtrace.join("\n")
       log.error "Cannot output messages with tag '#{tag}'"
