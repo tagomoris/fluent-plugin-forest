@@ -168,7 +168,11 @@ class Fluent::ForestOutput < Fluent::MultiOutput
       output = plant(tag)
     end
     if output
-      output.emit(tag, es, chain)
+      if output.respond_to?(:emit_events)
+        output.emit_events(tag, es)
+      else
+        output.emit(tag, es, chain)
+      end
     else
       chain.next
     end
