@@ -131,6 +131,7 @@ class Fluent::ForestOutput < Fluent::MultiOutput
           output = Fluent::Plugin.new_output(@subtype)
           output.configure(spec(tag))
           output.start
+          output.after_start if output.respond_to?(:after_start)
           @mapping[tag] = output
           @outputs.push(output)
         end
@@ -167,14 +168,11 @@ class Fluent::ForestOutput < Fluent::MultiOutput
     unless output
       output = plant(tag)
     end
-    if output
-      if output.respond_to?(:emit_events)
-        output.emit_events(tag, es)
-      else
-        output.emit(tag, es, chain)
-      end
+    if output.respond_to?(:emit_events)
+      output.emit_events(tag, es)
     else
-      chain.next
+      output.emit(tag, es, chain)
     end
+    chain.next
   end
 end
