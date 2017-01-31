@@ -1,5 +1,7 @@
 # fluent-plugin-forest
 
+**NOTE: This plugin will not be updated: Use Fluentd v0.14 native API to handle tags.**
+
 This is a plugin for [Fluentd](http://fluentd.org).
 
 ## Component
